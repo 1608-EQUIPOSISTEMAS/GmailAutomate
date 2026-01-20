@@ -239,8 +239,15 @@ function generarHtmlFinal(alumno, programa, links) {
 
     return html;
 }
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: "ok",
+        server: "WE Email VPS",
+        time: new Date().toISOString()
+    });
+});
 
 // ================= START SERVER =================
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 API Server listening on port ${PORT}`);
 });
