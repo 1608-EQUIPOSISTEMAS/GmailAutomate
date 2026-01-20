@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenida WE Educación</title>
+    <style>
+        /* --- FUENTES: Forzamos Tahoma --- */
+        body, table, td, a, p, h1, h2, h3, span, div { 
+            font-family: tahoma !important; 
+        }
+
+        /* Estilos generales */
+        body, table, td, a { -webkit-text-size-adjust: none; -ms-text-size-adjust: none; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        
+        /* NO HAY MEDIA QUERIES: El diseño será fijo siempre */
+    </style>
+</head>
+<body style="margin: 0; padding: 0;">
+  <br>
+  <br>
+
+    <table style="padding-top:20px!important" border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                
+                <table border="0" cellpadding="0" cellspacing="0" width="750" style="width: 750px; min-width: 750px; margin: 0 auto;">
+                    
+                    <tr>
+                        <td align="center" style="padding: 0;">
+                            <img src="<?= pPrograma.imagen ?>" 
+                                 alt="Bienvenida" 
+                                 width="630"
+                                 style="width: 630px; height: auto; display: block;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center" style="padding: 15px 40px;">
+                            <h1 style="margin: 0 0 10px 0; font-size: 24px; font-weight: bold; text-align: center; line-height: 1.3;">
+                                ¡Hola <?= pDatos.first_name ?>! <img src="https://drive.google.com/uc?export=download&id=1LnJWJM5g2ougTJU7Uh9B4wGXypLaDkXy" width="30" height="30" style="vertical-align: middle; margin-left: 5px; display: inline-block;">
+                            </h1>
+                            
+                            <p style="margin: 0; font-size: 13px; line-height: 1.5; text-align: center;font-family: sans-serif!important;">
+                               Estamos a <b>48 horas de iniciar tu programa en W|E Educación Ejecutiva</b>
+                                <img src="https://drive.google.com/uc?export=download&id=1rE5QhsdKt74x39S8G9hUErh5cVxGo7ca" width="20" height="20" style="vertical-align: middle; margin-right: 5px; display: inline-block;">
+                            </p>
+
+                            <p style="margin: 0; font-size: 13px; text-align: center; line-height: 1.5;font-family: sans-serif!important;">
+                                Queremos asegurarnos de que tengas <strong>clarísimo cómo y por dónde conectarte</strong> el día de la clase.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 15px 40px; text-align: center;">
+                            
+                            <hr align="center" style="width: 50%; border: 0; border-top: 1px solid #cccccc; margin: 0 auto 20px auto;">
+
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="text-align: center;">
+                                        <img src="https://drive.google.com/uc?export=download&id=1dMzpuDXrwJ4sOJgudMksFVhkNgNeTCJP" width="20" height="20" style="vertical-align: middle; margin-right: 5px; display: inline-block;">
+                                        <span style="margin: 0; font-size: 18px; display: inline; text-align: center;">Acceso directo a tu clase <b>En Vivo</b></span>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td align="center" style="padding-top: 5px; text-align: center;">
+                                        <p style="margin: 0; font-size: 13px; text-align: center;">
+                                El día de inicio podrás ingresar a la sesión en vivo haciendo clic en el siguiente botón:
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding: 5px 0 5px 0;">
+                                        <a href="<?= pLinks.teams ?>" target="_blank">
+                                            <img src="https://drive.google.com/uc?export=download&id=1puEipaTc8OzjNbok6veXcdUJ2WbsNfLz" 
+                                                 alt="Videotutorial Campus" 
+                                                 width="350" style="display: block; width: 350px; height: auto; border-radius: 50px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin: 0 auto;">
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-bottom: 10px; text-align: center;">
+                                        <p style="margin: 0; font-size: 13px; text-align: center;">
+                                            <img src="https://drive.google.com/uc?export=download&id=1b-sXnAKIAx_XqlAqeNvrsaiBAfulKc9i" width="17" height="17" style="vertical-align: middle; margin-right: 5px; display: inline-block;">
+                                            <i> Te recomendamos ingresar con 10 minutos de anticipación.</i>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <hr align="center" style="width: 50%; border: 0; border-top: 1px solid #cccccc; margin: 10px auto 15px auto;">
+
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="text-align: center;">
+                                        <img src="https://drive.google.com/uc?export=download&id=1I4k74kBigX_k98eicL2hM8WwWfT8966t" width="30" height="30" style="vertical-align: middle; margin-right: 5px; display: inline-block;">
+                                        <span style="margin: 0; font-size: 18px; display: inline; text-align: center; line-height: 1.3;">¿Ya estás en el grupo oficial de <b>WhatsApp?</b></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-top: 15px; text-align: center;">
+                                        <p style="margin: 0; font-size: 13px; text-align: center;">
+                                            El <b>grupo de WhatsApp del programa</b> es el principal canal para:
+                                        </p> 
+                                        <p style="margin: 0; font-size: 13px; text-align: center;">
+                                            1. Recordatorios antes de cada clase
+                                        </p>
+                                        <p style="margin: 0; font-size: 13px; text-align: center;">
+                                            2. Envío rápido del link de acceso
+                                        </p>
+                                        <p style="margin: 0; font-size: 13px; text-align: center;">
+                                            3. Avisos académicos importantes
+                                        </p>
+                                    </td>
+                                </tr>
+                                <br>
+                            </table>
+                            
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding: 0px 0 10px 0;">
+                                        <a href="<?= pLinks.whatsapp ?>" target="_blank">
+                                            <img src="https://drive.google.com/uc?export=download&id=1e6GYu7I85fF9CZY6pwWRS65oB5cw7BGN" 
+                                                 alt="Videotutorial Campus" 
+                                                 width="350" style="display: block; width: 350px; height: auto; border-radius: 50px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin: 0 auto;">
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-top: 5px; text-align: center;">
+                                        <p style="margin: 0; font-size: 13px; text-align: center;">
+                                             <img src="https://drive.google.com/uc?export=download&id=1j_SzxoHtFdLZ9b8yFQeqD0pt4pICDNO5" width="20" height="20" style="vertical-align: middle; margin-right: 5px; display: inline-block;"> 
+                                             <i> Si no estás en el grupo, podrías perder información clave del programa.</i>
+
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <hr align="center" style="width: 50%; border: 0; border-top: 1px solid #cccccc; margin: 20px auto;">
+
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 15px;">
+                                <tr>
+                                    <td align="center" style="text-align: center;">
+                                        <img src="https://drive.google.com/uc?export=download&id=1rE5QhsdKt74x39S8G9hUErh5cVxGo7ca" width="30" height="30" style="vertical-align: middle; margin-right: 5px; display: inline-block;">
+                                        <span style="margin: 0; font-size: 18px; display: inline; text-align: center; line-height: 1.3;">Todo también está en el <b>Campus Virtual</b></span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="text-align: center;">
+                                        <p style="margin: 0; font-size: 13px; line-height: 1.5; display: inline; text-align: center;">
+                                            Para tu tranquilidad,<b> todos los enlaces de clase</b>, materiales y comunicaciones oficiales
+                                            <br> también estarán disponibles en el <strong>Campus Virtual W|E.</strong>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding: 5px 0 20px 0;">
+                                        <a href="https://we-educacion.com/web/login" target="_blank">
+                                            <img src="https://drive.google.com/uc?export=download&id=14Ue_o6uQiobvl43mNa9zwcybGOfPB0E8" 
+                                                 alt="Videotutorial Campus" 
+                                                 width="350" style="display: block; width: 350px; height: auto; border-radius: 50px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin: 0 auto;">
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td align="center" style="padding: 0;">
+                            <a href="https://www.youtube.com/watch?v=LgP2fc6ttgg" target="_blank">
+                            <img  src="https://drive.google.com/uc?export=download&id=1dQnzpVcHtkt4ftvGIVfw9ilHTcx0CT1R" 
+                                 alt="Bienvenida" 
+                                 width="600"
+                                 style="width: 630px; height: auto; display: block;">
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding: 15px 40px 40px 40px; text-align: center;">
+                            <p style="margin: 0 0 20px 0; font-size: 13px; text-align: center;font-family: sans-serif!important;">
+                                <b> ¿Tienes alguna duda antes de empezar?</b>
+                            </p>
+                            <p style="margin: 0 0 20px 0; font-size: 13px; text-align: center;font-family: sans-serif!important;">
+                                Comunícate con nosotros al WhatsApp:  <a href="https://wa.me/51922744702" style="color: #0056b3; text-decoration: underline;">+51 922744702</a>
+                            </p>
+                            
+                            <p style="margin: 0 0 5px 0; font-size: 15px; text-align: center;font-family: sans-serif!important;">
+                                Nos alegra mucho acompañarte en este nuevo paso de tu desarrollo profesional
+                                <img src="https://drive.google.com/uc?export=download&id=14W4lp6B67xKH5y0poJb5yCHoZhpjGnSp" width="17" height="17" style="vertical-align: middle; margin-right: 5px; display: inline-block;">
+                            </p>
+                            
+                            <p style="margin: 0; font-size: 13px; font-weight: bold; text-align: center;font-family: sans-serif!important;">
+                               ¡Nos vemos muy pronto en clase!
+                            </p>
+                            <br>
+                            <p style="margin: 0; font-size: 13px; font-weight: bold; text-align: center;font-family: sans-serif!important;">
+                                Un cordial saludo,
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    
+    <?!= obtenerHtml('Footer') ?>
+
+</body>
+</html>
