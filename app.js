@@ -38,10 +38,11 @@ const transporter = nodemailer.createTransport({
 
 let cacheProgramas = null;
 
-// ================= API ENDPOINT =================
-app.post('/api/send-emails', async (req, res) => {
+
+// ================= API ENDPOINT (MODO ASÍNCRONO / FIRE & FORGET) =================
+app.post('/api/send-emails', (req, res) => {
     // 1. Security Check
-    const token = req.query.token; // ?token=... in the URL
+    const token = req.query.token; 
     if (token !== API_SECRET) {
         return res.status(403).json({ error: "Access Denied. Invalid Token." });
     }
@@ -53,17 +54,26 @@ app.post('/api/send-emails', async (req, res) => {
         return res.status(400).json({ error: "Missing 'sheetId' in request body." });
     }
 
-    console.log(`Received request for Sheet ID: ${sheetId}`);
+    console.log(`📩 Solicitud recibida para Sheet ID: ${sheetId}`);
 
-    // 3. Run the Process (Non-blocking or Blocking depending on preference)
-    // We await it here so we can return the result to Apps Script
-    try {
-        const result = await procesarEnvios48Horas(sheetId);
-        res.json({ success: true, message: "Process completed.", details: result });
-    } catch (error) {
-        console.error("API Error:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
+    // 3. RESPONDER INMEDIATAMENTE AL CLIENTE (APPS SCRIPT)
+    // Le decimos "OK, recibido" para que Apps Script cierre la conexión y sea feliz.
+    res.json({ 
+        success: true, 
+        message: "Solicitud recibida. El envío de correos ha comenzado en segundo plano." 
+    });
+
+    // 4. EJECUTAR EL PROCESO EN SEGUNDO PLANO
+    // NO usamos 'await' aquí para no bloquear la respuesta anterior.
+    procesarEnvios48Horas(sheetId)
+        .then(resultado => {
+            console.log("✅ Proceso en background terminado:", resultado);
+        })
+        .catch(error => {
+            console.error("❌ Error crítico en background:", error);
+            // Aquí podrías agregar un envío de correo a ti mismo avisando que falló,
+            // ya que Apps Script ya se desconectó y no se enterará del error.
+        });
 });
 
 // ================= MAIN LOGIC (Refactored) =================
@@ -145,7 +155,7 @@ async function procesarEnvios48Horas(currentSheetId) {
                 await transporter.sendMail({
                     from: `"WE Educación Ejecutiva" <${ZOHO_USER}>`,
                     to: alumno.email,
-                    subject: `Faltan 48h: Accesos para tu clase de ${infoPrograma.nombre}`,
+                    subject: `🔔 Ya tienes todo listo para iniciar - W|E Educación Ejecutiva`,
                     html: htmlContent,
                 });
 
