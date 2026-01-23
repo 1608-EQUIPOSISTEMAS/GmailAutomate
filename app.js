@@ -6,48 +6,49 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = 4111; // You can change this port if needed
+const PORT = 4111;
 
-// Middleware to parse JSON bodies
+// Middleware para procesar JSON
 app.use(bodyParser.json());
 
-// ================= CONFIGURATION =================
+// ================= CONFIGURACIÓN =================
 const KEY_FILE = 'credentials/service.json'; 
-const ID_BASE_PROGRAMAS = '15lwYAg7Oenr0zhG5v4hs0f0d4QVEfg5GBPfWcEGfpI4'; // This stays static usually
+const ID_BASE_PROGRAMAS = '15lwYAg7Oenr0zhG5v4hs0f0d4QVEfg5GBPfWcEGfpI4'; 
 
-// Zoho Credentials
-const ZOHO_USER = "alumno.we@we-educacion.com";
-const ZOHO_PASS = "we.2023.we"; 
-
-// Security Token (To prevent unauthorized access)
+// Credenciales
+const ZOHO_USER = "alumno.we@we-educacion.com"; // Este será el remitente
 const API_SECRET = "CLAVE_SEGURA_WE_2026"; 
 
-// ================= INITIALIZATION =================
+// ================= INICIALIZACIÓN =================
 const auth = new google.auth.GoogleAuth({
     keyFile: KEY_FILE,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     clientOptions: { http2: false }
 });
 
+// --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE (ZEPTOMAIL) ---
 const transporter = nodemailer.createTransport({
-    host: "smtppro.zoho.com", 
-    port: 465, 
-    secure: true, 
-    auth: { user: ZOHO_USER, pass: ZOHO_PASS },
+    host: "smtp.zeptomail.com",
+    port: 587,
+    secure: false, // Se usa false para el puerto 587
+    auth: {
+        user: "emailapikey", // Siempre es este usuario
+        // Esta es tu clave larga de ZeptoMail:
+        pass: "wSsVR61y8xPyBvx1yjStL+1qnVUHAAz2REt/i1Kj73WvT6zD9scyxUCbDQWhGvQaGDNpQTYT8egumxoB0mEL2tkpzlsGXCiF9mqRe1U4J3x17qnvhDzNWm9fmhGLKIoKww1tn2hgE8ok+g=="
+    },
 });
 
 let cacheProgramas = null;
 
-
-// ================= API ENDPOINT (MODO ASÍNCRONO / FIRE & FORGET) =================
+// ================= API ENDPOINT =================
 app.post('/api/send-emails', (req, res) => {
-    // 1. Security Check
+    // 1. Verificación de seguridad
     const token = req.query.token; 
     if (token !== API_SECRET) {
         return res.status(403).json({ error: "Access Denied. Invalid Token." });
     }
 
-    // 2. Get Sheet ID from Body
+    // 2. Obtener ID de la hoja
     const { sheetId } = req.body;
     
     if (!sheetId) {
@@ -56,43 +57,39 @@ app.post('/api/send-emails', (req, res) => {
 
     console.log(`📩 Solicitud recibida para Sheet ID: ${sheetId}`);
 
-    // 3. RESPONDER INMEDIATAMENTE AL CLIENTE (APPS SCRIPT)
-    // Le decimos "OK, recibido" para que Apps Script cierre la conexión y sea feliz.
+    // 3. RESPUESTA INMEDIATA (Para que Google Sheets no se quede cargando)
     res.json({ 
         success: true, 
-        message: "Solicitud recibida. El envío de correos ha comenzado en segundo plano." 
+        message: "Solicitud recibida. El envío rápido vía ZeptoMail ha comenzado." 
     });
 
-    // 4. EJECUTAR EL PROCESO EN SEGUNDO PLANO
-    // NO usamos 'await' aquí para no bloquear la respuesta anterior.
+    // 4. EJECUTAR PROCESO EN SEGUNDO PLANO
     procesarEnvios48Horas(sheetId)
         .then(resultado => {
-            console.log("✅ Proceso en background terminado:", resultado);
+            console.log("✅ Proceso terminado:", resultado);
         })
         .catch(error => {
-            console.error("❌ Error crítico en background:", error);
-            // Aquí podrías agregar un envío de correo a ti mismo avisando que falló,
-            // ya que Apps Script ya se desconectó y no se enterará del error.
+            console.error("❌ Error en background:", error);
         });
 });
 
-// ================= MAIN LOGIC (Refactored) =================
+// ================= LÓGICA PRINCIPAL =================
 async function procesarEnvios48Horas(currentSheetId) {
-    console.log(`🚀 Starting process for Sheet: ${currentSheetId}`);
+    console.log(`🚀 Iniciando proceso rápido para Sheet: ${currentSheetId}`);
     const client = await auth.getClient();
     const sheets = google.sheets({ version: 'v4', auth: client });
     let emailsSent = 0;
 
-    // 1. READ SHEET '3. Aula'
+    // 1. LEER HOJA '3. Aula'
     const res = await sheets.spreadsheets.values.get({
-        spreadsheetId: currentSheetId, // Uses the ID sent via API
+        spreadsheetId: currentSheetId,
         range: '3. Aula!A:Z', 
     });
     
     const rows = res.data.values;
     if (!rows || !rows.length) return "Sheet is empty.";
 
-    // COLUMNS MAPPING
+    // MAPEO DE COLUMNAS
     const COL = {
         curso: 0,    // A 
         fecha: 2,    // C 
@@ -103,16 +100,17 @@ async function procesarEnvios48Horas(currentSheetId) {
         check48h: 25 // Z 
     };
 
-    console.log("📥 Loading programs database...");
+    console.log("📥 Cargando base de programas...");
     await cargarBaseProgramas(sheets);
 
-    // PROCESS ROWS
+    // PROCESAR FILAS
     for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         
         if (!row[COL.nombre]) continue; 
         const estado48h = row[COL.check48h];
         
+        // Solo procesar si NO dice "OK"
         if (estado48h !== "OK" && estado48h !== true && estado48h !== "TRUE") {
             
             const alumno = {
@@ -127,19 +125,19 @@ async function procesarEnvios48Horas(currentSheetId) {
 
             if (!alumno.email || !alumno.email.includes("@")) continue;
 
-            console.log(`🔄 Processing: ${alumno.nombre}...`);
+            console.log(`🔄 Procesando: ${alumno.nombre}...`);
 
             try {
-                // DATA GATHERING
+                // PREPARAR DATOS
                 const infoPrograma = getInfoPrograma(alumno.cursoCod);
                 const fechaTexto = formatearFecha(alumno.fechaRaw);
                 
-                // LINK VALIDATION
+                // VALIDAR LINKS
                 const tieneWsp = alumno.linkWsp && alumno.linkWsp.includes("http");
                 const tieneTeams = alumno.linkTeams && alumno.linkTeams.includes("http");
 
                 if (!tieneWsp && !tieneTeams) {
-                    console.log("   🛑 STOPPED: Missing links.");
+                    console.log("   🛑 SALTADO: Faltan links.");
                     continue; 
                 }
 
@@ -148,10 +146,10 @@ async function procesarEnvios48Horas(currentSheetId) {
                     teams: alumno.linkTeams
                 };
 
-                // HTML GENERATION
+                // GENERAR HTML
                 const htmlContent = generarHtmlFinal(alumno, infoPrograma, linksObj);
 
-                // SEND EMAIL
+                // ENVIAR CORREO (Vía ZeptoMail)
                 await transporter.sendMail({
                     from: `"WE Educación Ejecutiva" <${ZOHO_USER}>`,
                     to: alumno.email,
@@ -159,7 +157,7 @@ async function procesarEnvios48Horas(currentSheetId) {
                     html: htmlContent,
                 });
 
-                // UPDATE SHEET
+                // ACTUALIZAR GOOGLE SHEETS A "OK"
                 await sheets.spreadsheets.values.update({
                     spreadsheetId: currentSheetId,
                     range: `3. Aula!Z${alumno.fila}`,
@@ -167,22 +165,25 @@ async function procesarEnvios48Horas(currentSheetId) {
                     resource: { values: [['OK']] },
                 });
 
-                console.log(`   ✅ Email sent successfully.`);
+                console.log(`   ✅ Enviado con éxito.`);
                 emailsSent++;
                 
-                // Safety pause
-                await new Promise(r => setTimeout(r, 2000)); 
+                // --- PAUSA MÍNIMA (NUEVO) ---
+                // Ya no esperamos 60 segundos. Solo 1 segundo por cortesía al servidor.
+                await new Promise(r => setTimeout(r, 1000)); 
 
             } catch (error) {
-                console.error(`   ❌ Error with ${alumno.nombre}:`, error.message);
+                console.error(`   ❌ Error con ${alumno.nombre}:`, error.message);
+                // Si falla, esperamos 5 segundos antes del siguiente intento
+                await new Promise(r => setTimeout(r, 5000));
             }
         }
     }
-    console.log("🏁 Process finished.");
+    console.log("🏁 Proceso finalizado.");
     return `${emailsSent} emails sent.`;
 }
 
-// ================= HELPER FUNCTIONS =================
+// ================= FUNCIONES AUXILIARES =================
 
 async function cargarBaseProgramas(sheets) {
     try {
@@ -203,7 +204,7 @@ async function cargarBaseProgramas(sheets) {
             });
         }
     } catch (e) {
-        console.log("⚠️ Error loading programs DB.");
+        console.log("⚠️ Error cargando DB programas.");
     }
 }
 
@@ -218,12 +219,11 @@ function formatearFecha(fechaRaw) {
 }
 
 function generarHtmlFinal(alumno, programa, links) {
-    // Absolute paths
     const pathTemplate = path.join(__dirname, 'template_48h.html');
     const pathFooter = path.join(__dirname, 'footer.html');
 
     if (!fs.existsSync(pathTemplate)) {
-        console.error("   ❌ CRITICAL ERROR: 'template_48h.html' not found");
+        console.error("   ❌ ERROR CRÍTICO: No se encuentra 'template_48h.html'");
         return "<h1>Error: Missing template.</h1>";
     }
 
@@ -238,7 +238,7 @@ function generarHtmlFinal(alumno, programa, links) {
 
     const primerNombre = alumno.nombre.split(" ")[0];
 
-    // REPLACEMENTS
+    // REEMPLAZOS
     let html = template
         .replace(/<\?= pDatos\.first_name \?>/g, primerNombre)
         .replace(/<\?= pPrograma\.imagen \?>/g, programa.imagen || "") 
@@ -249,15 +249,16 @@ function generarHtmlFinal(alumno, programa, links) {
 
     return html;
 }
+
 app.get('/health', (req, res) => {
     res.status(200).json({
-        status: "ok",
+        status: "ok ZeptoMail Active",
         server: "WE Email VPS",
         time: new Date().toISOString()
     });
 });
 
-// ================= START SERVER =================
+// ================= INICIAR SERVIDOR =================
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 API Server listening on port ${PORT}`);
+    console.log(`🚀 API Server escuchando en puerto ${PORT}`);
 });
