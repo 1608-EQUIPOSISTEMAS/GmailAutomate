@@ -95,6 +95,7 @@ async function procesarEnvios48Horas(currentSheetId) {
         fecha: 2,    // C 
         nombre: 4,   // E 
         correo: 6,   // G 
+        estado: 9,   // J  <-- AGREGADO
         wsp: 23,     // X 
         teams: 24,   // Y 
         check48h: 25 // Z 
@@ -108,6 +109,15 @@ async function procesarEnvios48Horas(currentSheetId) {
         const row = rows[i];
         
         if (!row[COL.nombre]) continue; 
+
+        // --- FILTRO DE SEGURIDAD (DOBLE CHECK) ---
+        // Aunque el Apps Script ya debería haberlos limpiado,
+        // el servidor se asegura de NO tocar a nadie que no sea 'ACT'.
+        if (row[COL.estado] !== "ACT") {
+            continue; 
+        }
+        // -----------------------------------------
+
         const estado48h = row[COL.check48h];
         
         // Solo procesar si NO dice "OK"
@@ -130,7 +140,7 @@ async function procesarEnvios48Horas(currentSheetId) {
             try {
                 // PREPARAR DATOS
                 const infoPrograma = getInfoPrograma(alumno.cursoCod);
-                const fechaTexto = formatearFecha(alumno.fechaRaw);
+                const fechaTexto = formatearFecha(alumno.fechaRaw); // No se usa en el template actual pero está disponible
                 
                 // VALIDAR LINKS
                 const tieneWsp = alumno.linkWsp && alumno.linkWsp.includes("http");
@@ -168,13 +178,11 @@ async function procesarEnvios48Horas(currentSheetId) {
                 console.log(`   ✅ Enviado con éxito.`);
                 emailsSent++;
                 
-                // --- PAUSA MÍNIMA (NUEVO) ---
-                // Ya no esperamos 60 segundos. Solo 1 segundo por cortesía al servidor.
+                // PAUSA MÍNIMA
                 await new Promise(r => setTimeout(r, 1000)); 
 
             } catch (error) {
                 console.error(`   ❌ Error con ${alumno.nombre}:`, error.message);
-                // Si falla, esperamos 5 segundos antes del siguiente intento
                 await new Promise(r => setTimeout(r, 5000));
             }
         }
