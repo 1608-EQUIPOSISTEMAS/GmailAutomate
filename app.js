@@ -73,7 +73,6 @@ app.post('/api/send-emails', (req, res) => {
         });
 });
 
-// ================= LÓGICA PRINCIPAL =================
 async function procesarEnvios48Horas(currentSheetId) {
     console.log(`🚀 Iniciando proceso rápido para Sheet: ${currentSheetId}`);
     const client = await auth.getClient();
@@ -81,24 +80,25 @@ async function procesarEnvios48Horas(currentSheetId) {
     let emailsSent = 0;
 
     // 1. LEER HOJA '3. Aula'
+    // Nota: Cambiamos A:Z a A:W para leer solo lo necesario, aunque A:Z funciona igual.
     const res = await sheets.spreadsheets.values.get({
         spreadsheetId: currentSheetId,
-        range: '3. Aula!A:Z', 
+        range: '3. Aula!A:W', 
     });
     
     const rows = res.data.values;
     if (!rows || !rows.length) return "Sheet is empty.";
 
-    // MAPEO DE COLUMNAS
+    // MAPEO DE COLUMNAS ACTUALIZADO (U, V, W)
     const COL = {
         curso: 0,    // A 
         fecha: 2,    // C 
         nombre: 4,   // E 
         correo: 6,   // G 
-        estado: 9,   // J  <-- AGREGADO
-        wsp: 23,     // X 
-        teams: 24,   // Y 
-        check48h: 25 // Z 
+        estado: 9,   // J 
+        wsp: 20,     // U (Antes era 23)
+        teams: 21,   // V (Antes era 24)
+        check48h: 22 // W (Antes era 25)
     };
 
     console.log("📥 Cargando base de programas...");
@@ -110,13 +110,10 @@ async function procesarEnvios48Horas(currentSheetId) {
         
         if (!row[COL.nombre]) continue; 
 
-        // --- FILTRO DE SEGURIDAD (DOBLE CHECK) ---
-        // Aunque el Apps Script ya debería haberlos limpiado,
-        // el servidor se asegura de NO tocar a nadie que no sea 'ACT'.
+        // --- FILTRO DE SEGURIDAD ---
         if (row[COL.estado] !== "ACT") {
             continue; 
         }
-        // -----------------------------------------
 
         const estado48h = row[COL.check48h];
         
@@ -140,7 +137,7 @@ async function procesarEnvios48Horas(currentSheetId) {
             try {
                 // PREPARAR DATOS
                 const infoPrograma = getInfoPrograma(alumno.cursoCod);
-                const fechaTexto = formatearFecha(alumno.fechaRaw); // No se usa en el template actual pero está disponible
+                const fechaTexto = formatearFecha(alumno.fechaRaw);
                 
                 // VALIDAR LINKS
                 const tieneWsp = alumno.linkWsp && alumno.linkWsp.includes("http");
@@ -167,10 +164,10 @@ async function procesarEnvios48Horas(currentSheetId) {
                     html: htmlContent,
                 });
 
-                // ACTUALIZAR GOOGLE SHEETS A "OK"
+                // ACTUALIZAR GOOGLE SHEETS A "OK" (EN COLUMNA W)
                 await sheets.spreadsheets.values.update({
                     spreadsheetId: currentSheetId,
-                    range: `3. Aula!Z${alumno.fila}`,
+                    range: `3. Aula!W${alumno.fila}`, // <--- CAMBIADO A W
                     valueInputOption: 'RAW',
                     resource: { values: [['OK']] },
                 });
@@ -190,7 +187,6 @@ async function procesarEnvios48Horas(currentSheetId) {
     console.log("🏁 Proceso finalizado.");
     return `${emailsSent} emails sent.`;
 }
-
 // ================= FUNCIONES AUXILIARES =================
 
 async function cargarBaseProgramas(sheets) {
