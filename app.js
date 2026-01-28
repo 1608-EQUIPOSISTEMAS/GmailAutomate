@@ -79,11 +79,11 @@ async function procesarEnvios48Horas(currentSheetId) {
     const sheets = google.sheets({ version: 'v4', auth: client });
     let emailsSent = 0;
 
-    // 1. LEER HOJA '3. Aula'
+    // 1. LEER HOJA '1. AULA'
     // Nota: Cambiamos A:Z a A:W para leer solo lo necesario, aunque A:Z funciona igual.
     const res = await sheets.spreadsheets.values.get({
         spreadsheetId: currentSheetId,
-        range: '3. Aula!A:W', 
+        range: '1. AULA!A:W', 
     });
     
     const rows = res.data.values;
@@ -167,7 +167,7 @@ async function procesarEnvios48Horas(currentSheetId) {
                 // ACTUALIZAR GOOGLE SHEETS A "OK" (EN COLUMNA W)
                 await sheets.spreadsheets.values.update({
                     spreadsheetId: currentSheetId,
-                    range: `3. Aula!W${alumno.fila}`, // <--- CAMBIADO A W
+                    range: `1. AULA!W${alumno.fila}`, // <--- CAMBIADO A W
                     valueInputOption: 'RAW',
                     resource: { values: [['OK']] },
                 });
