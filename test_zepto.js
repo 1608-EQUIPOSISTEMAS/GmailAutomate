@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
     secure: false, 
     auth: {
         user: "emailapikey", 
-        pass: "wSsVR61y8xPyBvx1yjStL+1qnVUHAAz2REt/i1Kj73WvT6zD9scyxUCbDQWhGvQaGDNpQTYT8egumxoB0mEL2tkpzlsGXCiF9mqRe1U4J3x17qnvhDzNWm9fmhGLKIoKww1tn2hgE8ok+g=="
+        pass: "wSsVR6108xbyD6p7nGf/db07m1UHBQ/wF0160VX37SD5F/yRocc/kxLLAgKgGqcWRTJoF2RApu8gkB4ChzdbjN4lzFFSCyiF9mqRe1U4J3x17qnvhDzKV2hVmxOJJIkOwghin2hkG80m+g=="
     },
 });
 
