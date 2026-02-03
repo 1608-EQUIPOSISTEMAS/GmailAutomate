@@ -108,6 +108,48 @@ app.get('/health', (req, res) => {
     res.send("API ZeptoMail Ready (JSON Mode).");
 });
 
+// ============================================================
+// NUEVO ENDPOINT: CONFIRMACIÓN DE INSCRIPCIÓN / PAGOS (UNITARIO)
+// Recibe el HTML listo desde Apps Script y envía como 'pagos@'
+// ============================================================
+app.post('/api/send-inscription', async (req, res) => {
+
+    // 1. Verificación de seguridad
+    const token = req.body.token;
+    if (token !== API_SECRET) {
+        return res.status(403).json({ success: false, message: "Access Denied." });
+    }
+
+    // 2. Recibir datos del Excel (Apps Script)
+    // Nota: Aquí esperamos recibir 'htmlBody' ya renderizado
+    const { email, nombre, asunto, htmlBody } = req.body;
+
+    if (!email || !htmlBody) {
+        return res.status(400).json({ success: false, message: "Faltan datos (email o html)." });
+    }
+
+    console.log(`💳 Procesando inscripción para: ${email}`);
+
+    try {
+        // 3. Enviar usando el Transporter existente (ZeptoMail)
+        // FORZAMOS EL REMITENTE A PAGOS@
+        let info = await transporter.sendMail({
+            from: '"WE Educación Ejecutiva" <pagos@we-educacion.com>', 
+            to: `"${nombre}" <${email}>`,
+            subject: asunto,
+            html: htmlBody // El HTML viene listo del Excel
+        });
+
+        console.log(`   ✅ Enviado ID: ${info.messageId}`);
+        res.json({ success: true, message: "Correo enviado correctamente" });
+
+    } catch (error) {
+        console.error(`   ❌ Error enviando a ${email}:`, error.message);
+        // Devolvemos error 500 para que Apps Script sepa que falló
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Servidor listo en puerto ${PORT}`);
 });
