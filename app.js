@@ -116,6 +116,7 @@ app.post('/api/send-emails-json', async (req, res) => {
             
             let finalHtml = selectedTemplate
                 .replace(/<\?= pDatos\.first_name \?>/g, primerNombre) 
+                .replace(/<\?= pDatos\.fecha \?>/g, student.fecha || "")
                 .replace(/<\?= pPrograma\.imagen \?>/g, student.programaImagen || "") 
                 .replace(/<\?= pPrograma\.nombre \?>/g, student.programaNombre || "Tu Programa")
                 .replace(/<\?= pLinks\.teams \?>/g, student.linkTeams || "#")
