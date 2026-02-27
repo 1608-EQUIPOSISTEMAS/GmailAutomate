@@ -15,7 +15,7 @@ const alumnoFake = {
     programaImagen: "https://we-educacion.com/wp-content/uploads/2024/01/power-apps.png",
     linkTeams: "https://teams.microsoft.com/l/meetup-join/LINK-DE-PRUEBA",
     linkWsp: "https://chat.whatsapp.com/LINK-DE-PRUEBA",
-    fecha: "18/02/2026" // <--- DATO AGREGADO: Fecha de inicio
+    fecha: "18/02/2026"
 };
 
 // ==========================================
