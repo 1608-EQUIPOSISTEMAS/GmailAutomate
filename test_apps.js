@@ -3,14 +3,16 @@ const fs = require('fs');
 const path = require('path');
 
 const CORREO_PRUEBA = "eliuthseguil@gmail.com"; 
+
 const alumnoFake = {
     email: CORREO_PRUEBA,
-    user: "SAP_EST_001",
+    user: "PA_EST_001",
     password: "ClaveSegura2026",
-    programa: "SAP HANA SD",                        // 👈
-    bannerId: "1FdSzuN51vbaxNlRTWGEDNLKpLOB6dhPt"  // 👈
+    programa: "CURSO POWER APPS Y POWER AUTOMATE",
+    bannerId: "1lQXJaTN01JOhXazV7k58AlWq60UTZLHR"
 };
-const transporter48h = nodemailer.createTransport({
+
+const transporter = nodemailer.createTransport({
     host: "smtp.zeptomail.com",
     port: 587,
     secure: false, 
@@ -20,14 +22,14 @@ const transporter48h = nodemailer.createTransport({
     },
 });
 
-async function probarPlantillaSAP() {
-    console.log("🚀 Iniciando prueba de Accesos SAP...");
+async function probarPlantillaPowerApps() {
+    console.log("🚀 Iniciando prueba de Accesos Power Apps...");
 
     try {
-        const templatePath = path.join(__dirname, 'template_sap.html');
+        const templatePath = path.join(__dirname, 'template_pwapps.html');
         const footerPath = path.join(__dirname, 'footer.html');
 
-        if (!fs.existsSync(templatePath)) throw new Error("Falta template_sap.html en la carpeta.");
+        if (!fs.existsSync(templatePath)) throw new Error("Falta template_pwapps.html en la carpeta.");
         
         let htmlTemplate = fs.readFileSync(templatePath, 'utf8');
         let htmlFooter = fs.existsSync(footerPath) ? fs.readFileSync(footerPath, 'utf8') : "";
@@ -39,18 +41,18 @@ async function probarPlantillaSAP() {
             .replace(/<\?= pDatos\.bannerId \?>/g, alumnoFake.bannerId)
             .replace(/<\?!= obtenerHtml\('Footer'\) \?>/g, htmlFooter);
 
-        let info = await transporter48h.sendMail({
+        await transporter.sendMail({
             from: `"WE Educación Ejecutiva" <alumno.we@we-educacion.com>`,
             to: alumnoFake.email,
-            subject: "🔔 [TEST SAP] Tus credenciales de acceso a SAP HANA MM",
+            subject: "🔔 [TEST PA] Tus credenciales de acceso a Power Apps",
             html: finalHtml,
         });
 
-        console.log("✅ Correo de prueba SAP enviado exitosamente a: " + alumnoFake.email);
+        console.log("✅ Correo de prueba Power Apps enviado a: " + alumnoFake.email);
 
     } catch (error) {
         console.error("❌ Error en la prueba:", error.message);
     }
 }
 
-probarPlantillaSAP();
+probarPlantillaPowerApps();

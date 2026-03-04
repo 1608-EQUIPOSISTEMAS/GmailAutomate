@@ -71,6 +71,8 @@ const templatePath24 = path.join(__dirname, 'template_24h.html');
 const footerPath = path.join(__dirname, 'footer.html');
 const templatePathSAP = path.join(__dirname, 'template_sap.html');
 
+
+let htmlTemplatePWAPPS = "";
 let htmlTemplateSAP = "";
 let htmlTemplate48 = "";
 let htmlTemplate24 = "";
@@ -81,6 +83,8 @@ try {
     if (fs.existsSync(templatePath24)) htmlTemplate24 = fs.readFileSync(templatePath24, 'utf8');
     if (fs.existsSync(footerPath)) htmlFooter = fs.readFileSync(footerPath, 'utf8');
     if (fs.existsSync(templatePathSAP)) htmlTemplateSAP = fs.readFileSync(templatePathSAP, 'utf8');
+    const templatePathPWAPPS = path.join(__dirname, 'template_pwapps.html');
+    if (fs.existsSync(templatePathPWAPPS)) htmlTemplatePWAPPS = fs.readFileSync(templatePathPWAPPS, 'utf8');
     console.log("✅ Plantillas cargadas en memoria.");
 } catch (e) {
     console.error("❌ Error cargando plantillas:", e.message);
@@ -230,10 +234,15 @@ app.post('/api/send-sap-emails', async (req, res) => {
 
     for (const student of students) {
         try {
+
             let finalHtml = htmlTemplateSAP
                 .replace(/<\?= pDatos\.user \?>/g, student.user || "No asignado") 
                 .replace(/<\?= pDatos\.password \?>/g, student.password || "No asignado")
+                .replace(/<\?= pDatos\.bannerId \?>/g, student.bannerId || "")
+                .replace(/<\?= pDatos\.programa \?>/g, student.programa || "SAP")
                 .replace(/<\?!= obtenerHtml\('Footer'\) \?>/g, htmlFooter);
+
+            
 
             // 👇 CAMBIO AQUÍ: Usamos el transporterSAP en lugar del 48h
             await transporterSAP.sendMail({
@@ -260,6 +269,62 @@ app.post('/api/send-sap-emails', async (req, res) => {
         errorCount: errorCount
     });
 });
+
+
+// ================= API ENDPOINT (ACCESOS POWER APPS) =================
+app.post('/api/send-pwapps-emails', async (req, res) => {
+    
+    const token = req.body.token; 
+    if (token !== API_SECRET) return res.status(403).json({ success: false, message: "Access Denied." });
+
+    const students = req.body.students;
+
+    if (!students || !Array.isArray(students) || students.length === 0) {
+        return res.status(400).json({ success: false, message: "No students data provided." });
+    }
+
+    if (!htmlTemplatePWAPPS) return res.status(500).json({ success: false, message: "Falta template_pwapps.html" });
+
+    console.log(`📩 Procesando ${students.length} alumnos para envío de Accesos Power Apps.`);
+
+    let sentCount = 0;
+    let errorCount = 0;
+
+    for (const student of students) {
+        try {
+            let finalHtml = htmlTemplatePWAPPS
+                .replace(/<\?= pDatos\.user \?>/g, student.user || "No asignado") 
+                .replace(/<\?= pDatos\.password \?>/g, student.password || "No asignado")
+                .replace(/<\?= pDatos\.programa \?>/g, student.programa || "Power Apps")
+                .replace(/<\?= pDatos\.bannerId \?>/g, student.bannerId || "")
+                .replace(/<\?!= obtenerHtml\('Footer'\) \?>/g, htmlFooter);
+
+            await transporterSAP.sendMail({
+                from: `"WE Educación Ejecutiva" <${ZOHO_USER}>`,
+                to: student.email,
+                subject: "USUARIO POWER APPS - W|E Educación Ejecutiva",
+                html: finalHtml,
+            });
+
+            console.log(`   ✅ (PWAPPS) Enviado a: ${student.email}`);
+            sentCount++;
+            await new Promise(r => setTimeout(r, 100));
+
+        } catch (error) {
+            console.error(`   ❌ Error enviando PWAPPS a ${student.email}:`, error.message);
+            errorCount++;
+        }
+    }
+
+    res.json({
+        success: true,
+        message: `Proceso de envíos Power Apps finalizado.`,
+        sentCount: sentCount,
+        errorCount: errorCount
+    });
+});
+
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Servidor listo en puerto ${PORT}`);
 });
