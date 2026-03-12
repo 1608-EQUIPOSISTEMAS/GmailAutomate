@@ -1,243 +1,52 @@
-const { google } = require('googleapis');
-const nodemailer = require('nodemailer');
-const fs = require('fs');
-const path = require('path');
+const fetch = require('node-fetch'); // npm install node-fetch@2
 
-// ================= CONFIGURACIÓN =================
-const KEY_FILE = 'credentials/service.json'; 
-const ID_HOJA_REGISTRO = '1Y0Jz7Yrekx152qRV7WXdu5Fb_NNtkB0aSVQbyJJ46so'; 
-const ID_BASE_PROGRAMAS = '15lwYAg7Oenr0zhG5v4hs0f0d4QVEfg5GBPfWcEGfpI4';
+const API_URL = "http://localhost:4111/api/send-emails-json";
+const API_SECRET = "CLAVE_SEGURA_WE_2026";
 
-// Credenciales ZOHO
-const ZOHO_USER = "alumno.we@we-educacion.com";
-const ZOHO_PASS = "we.2023.we"; 
-
-// ================= INICIALIZACIÓN =================
-const auth = new google.auth.GoogleAuth({
-    keyFile: KEY_FILE,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    // Mantenemos esto para evitar bloqueos en Windows
-    clientOptions: {
-        http2: false 
-    }
-});
-
-const transporter = nodemailer.createTransport({
-    host: "smtppro.zoho.com", 
-    port: 465, 
-    secure: true, 
-    auth: { user: ZOHO_USER, pass: ZOHO_PASS },
-});
-
-let cacheProgramas = null;
-
-// ================= LÓGICA PRINCIPAL =================
-async function procesarEnvios48Horas() {
-    console.log("🚀 Iniciando proceso 48h (Hoja: 3. Aula)...");
-    const client = await auth.getClient();
-    const sheets = google.sheets({ version: 'v4', auth: client });
-
-    // 1. LEER HOJA '3. Aula'
-    // Leemos hasta la columna Z (donde está el check 48h)
-    const res = await sheets.spreadsheets.values.get({
-        spreadsheetId: ID_HOJA_REGISTRO,
-        range: '3. Aula!A:Z', 
-    });
-    
-    const rows = res.data.values;
-    if (!rows || !rows.length) return console.log("Hoja vacía.");
-
-    // MAPEO DE COLUMNAS (Índices empiezan en 0)
-    // A=0, B=1, C=2 ... E=4 ... G=6 ... X=23, Y=24, Z=25
-    const COL = {
-        curso: 0,    // A - Código del Curso (para buscar la imagen)
-        fecha: 2,    // C - Fecha Inicio
-        nombre: 4,   // E - Nombres y Apellidos
-        correo: 6,   // G - Correo
-        wsp: 23,     // X - Link WhatsApp
-        teams: 24,   // Y - Link Teams
-        check48h: 25 // Z - Check 48h
-    };
-
-    console.log("📥 Cargando base de imágenes de programas...");
-    await cargarBaseProgramas(sheets);
-
-    //console.log(cacheProgramas)
-
-    // PROCESAR FILAS (Empezamos en i=1 para saltar encabezados)
-    for (let i = 1; i < rows.length; i++) {
-        const row = rows[i];
-        
-        // Validar que haya nombre
-        if (!row[COL.nombre]) continue; 
-        
-        const estado48h = row[COL.check48h];
-        
-        // Si NO está marcado como OK o TRUE, procesamos
-        if (estado48h !== "OK" && estado48h !== true && estado48h !== "TRUE") {
-            
-            const alumno = {
-                nombre: row[COL.nombre],
-                email: row[COL.correo],
-                cursoCod: row[COL.curso],
-                fechaRaw: row[COL.fecha], // Ej: 21/01/2026
-                linkWsp: row[COL.wsp],
-                linkTeams: row[COL.teams],
-                fila: i + 1
-            };
-
-            // Validaciones básicas de correo
-            if (!alumno.email || !alumno.email.includes("@")) {
-                continue;
-            }
-
-            console.log(`🔄 Procesando: ${alumno.nombre}...`);
-
-            try {
-                // A. OBTENER DATOS DEL PROGRAMA (Imagen, Nombre completo)
-                // Usamos la Columna A (Curso) para buscar en la base de datos
-                const infoPrograma = getInfoPrograma(alumno.cursoCod);
-
-                // B. FORMATEAR FECHA (De "21/01/2026" a texto bonito)
-                const fechaTexto = formatearFecha(alumno.fechaRaw);
-
-                // C. VALIDAR LINKS (Directos de la hoja)
-                const tieneWsp = alumno.linkWsp && alumno.linkWsp.includes("http");
-                const tieneTeams = alumno.linkTeams && alumno.linkTeams.includes("http");
-
-                console.log(`   📝 Curso: ${infoPrograma.nombre || alumno.cursoCod} | Inicio: ${fechaTexto}`);
-                console.log(`   🔗 Links Hoja: WSP=${tieneWsp ? '✅' : '❌'} | Teams=${tieneTeams ? '✅' : '❌'}`);
-
-                // SEGURIDAD: SI NO HAY LINKS EN LA HOJA, NO ENVIAR
-                if (!tieneWsp && !tieneTeams) {
-                    console.log("   🛑 DETENIDO: Faltan links en las columnas X o Y.");
-                    continue; 
-                }
-
-                // D. PREPARAR OBJETO LINKS PARA EL HTML
-                const linksObj = {
-                    whatsapp: alumno.linkWsp,
-                    teams: alumno.linkTeams
-                };
-
-                //imprimir contenido que habra
-                console.log(`   ✉️ Enviando correo a: ${alumno.email}`);
-                console.log(`   🖼️ Imagen: ${infoPrograma.imagen}`)
-                console.log(`   👤 Alumno: ${alumno.nombre} | Fila: ${alumno.fila}`)
-                console.log(`   🔗 Links a enviar: WhatsApp=${linksObj.whatsapp} | Teams=${linksObj.teams}`);
-                
-                // E. GENERAR HTML
-                const htmlContent = generarHtmlFinal(alumno, infoPrograma, linksObj);
-
-                // F. ENVIAR CORREO
-                await transporter.sendMail({
-                    from: `"WE Educación Ejecutiva" <${ZOHO_USER}>`,
-                    to: alumno.email,
-                    subject: `Faltan 48h: Accesos para tu clase de ${infoPrograma.nombre}`,
-                    html: htmlContent,
-                });
-
-                // G. ACTUALIZAR COLUMNA Z (48h) a "OK"
-                await sheets.spreadsheets.values.update({
-                    spreadsheetId: ID_HOJA_REGISTRO,
-                    // Columna Z es la letra Z
-                    range: `3. Aula!Z${alumno.fila}`,
-                    valueInputOption: 'RAW',
-                    resource: { values: [['OK']] },
-                });
-
-                console.log(`   ✅ Correo enviado exitosamente.`);
-                
-                // Pausa de seguridad para Zoho (2 segundos)
-                await new Promise(r => setTimeout(r, 2000)); 
-
-            } catch (error) {
-                console.error(`   ❌ Error:`, error.message);
-            }
+const payload = {
+    token: API_SECRET,
+    type: "48h",
+    students: [
+        {
+            email: "eliuthseguil@gmail.com",           // 👈 Cambia esto
+            nombre: "Juan Pérez",
+            fecha: "Lunes 16 de Junio, 2025 - 9:00 AM",
+            programaImagen: "https://drive.google.com/uc?export=download&id=1Jxdo5IVi2zf5GLHA0xqaL-f-UmxRh8O5",
+            programaNombre: "Diplomado en Gestión Empresarial",
+            linkTeams: "https://teams.microsoft.com/l/meetup-join/test",
+            linkWsp: "https://wa.me/5215500000000"
         }
-    }
-    console.log("🏁 Proceso finalizado.");
-}
+    ]
+};
 
-// ================= FUNCIONES AUXILIARES =================
+async function sendTest() {
+    console.log("🚀 Enviando prueba 48h...");
+    console.log(`   📧 Destinatario: ${payload.students[0].email}`);
+    console.log(`   👤 Nombre: ${payload.students[0].nombre}`);
+    console.log(`   📅 Fecha: ${payload.students[0].fecha}\n`);
 
-// Carga la base de datos de programas para sacar la IMAGEN y el NOMBRE COMPLETO
-async function cargarBaseProgramas(sheets) {
     try {
-        const res = await sheets.spreadsheets.values.get({
-            spreadsheetId: ID_BASE_PROGRAMAS,
-            range: 'Base Privada EN VIVO!A:K', 
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
         });
-        cacheProgramas = {};
-        if(res.data.values) {
-            res.data.values.forEach(row => {
-                // row[3] es el CÓDIGO (Ej: EX-CZ-02)
-                if (row[3]) {
-                    cacheProgramas[row[3].toString().trim()] = {
-                        nombre: row[5],  // Nombre bonito del curso
-                        imagen: row[6],  // URL del banner
-                        abreviatura: row[4]
-                    };
-                }
-            });
+
+        const data = await response.json();
+
+        if (data.success) {
+            console.log("✅ ÉXITO:");
+            console.log(`   Enviados:  ${data.sentCount}`);
+            console.log(`   Errores:   ${data.errorCount}`);
+            console.log(`   Mensaje:   ${data.message}`);
+        } else {
+            console.error("❌ FALLÓ:", data.message);
         }
-    } catch (e) {
-        console.log("⚠️ Error cargando base de programas. Se usarán datos por defecto.");
+
+    } catch (err) {
+        console.error("❌ Error de conexión:", err.message);
+        console.error("   ¿Está corriendo el servidor en puerto 4111?");
     }
 }
 
-function getInfoPrograma(cod) {
-    if (!cod) return { nombre: "Tu Curso", imagen: "" };
-    return cacheProgramas[cod.trim()] || { nombre: cod, imagen: "" };
-}
-
-function formatearFecha(fechaRaw) {
-    if (!fechaRaw) return "Fecha por confirmar";
-    // Si ya viene bonita, la devolvemos
-    return fechaRaw; 
-}
-
-function generarHtmlFinal(alumno, programa, links) {
-    console.log("   📂 Leyendo plantillas HTML...");
-    
-    // Rutas absolutas
-    const pathTemplate = path.join(__dirname, 'template_48h.html');
-    const pathFooter = path.join(__dirname, 'footer.html');
-
-    if (!fs.existsSync(pathTemplate)) {
-        console.error("   ❌ ERROR CRÍTICO: No encuentro 'template_48h.html'");
-        return "<h1>Error: Falta template.</h1>";
-    }
-
-    let template = fs.readFileSync(pathTemplate, 'utf8');
-    let footer = "";
-    
-    try {
-        if (fs.existsSync(pathFooter)) {
-            footer = fs.readFileSync(pathFooter, 'utf8');
-        }
-    } catch (e) {}
-
-    // DIAGNÓSTICO
-    if (template.length < 10) console.error("   ❌ ALERTA: El HTML está vacío.");
-
-    const primerNombre = alumno.nombre.split(" ")[0];
-
-    console.log("   🔄 Reemplazando variables...");
-
-    // === CORRECCIÓN AQUÍ ===
-    // Usamos \ antes de ? y . para que los encuentre literalmente
-    let html = template
-        .replace(/<\?= pDatos\.first_name \?>/g, primerNombre)
-        .replace(/<\?= pPrograma\.imagen \?>/g, programa.imagen || "") 
-        .replace(/<\?= pPrograma\.nombre \?>/g, programa.nombre)
-        .replace(/<\?= pLinks\.teams \?>/g, links.teams || "#")
-        .replace(/<\?= pLinks\.whatsapp \?>/g, links.whatsapp || "#")
-        // El footer ya lo tenías bien escapado, pero lo dejo por si acaso
-        .replace(/<\?!= obtenerHtml\('Footer'\) \?>/g, footer);
-
-    return html;
-}
-
-// Ejecutar
-procesarEnvios48Horas();
+sendTest();

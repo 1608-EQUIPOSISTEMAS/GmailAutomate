@@ -9,10 +9,10 @@ const path = require('path');
 const CORREO_PRUEBA = "eliuthseguil@gmail.com"; // <--- PON TU CORREO
 
 const alumnoFake = {
-    nombre: "Alvaro Calidad Test",
+    nombre: "CURSO MICROSOFT POWER BI",
     email: CORREO_PRUEBA,
     programaNombre: "POWER APPS Y AUTOMATIZACIÓN",
-    programaImagen: "https://we-educacion.com/wp-content/uploads/2024/01/power-apps.png",
+    programaImagen: "https://drive.google.com/uc?export=download&id=1Jxdo5IVi2zf5GLHA0xqaL-f-UmxRh8O5",
     linkTeams: "https://teams.microsoft.com/l/meetup-join/LINK-DE-PRUEBA",
     linkWsp: "https://chat.whatsapp.com/LINK-DE-PRUEBA",
     fecha: "18/02/2026"
