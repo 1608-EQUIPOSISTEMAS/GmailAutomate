@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recordatorio de Pago WE Educación</title>
+    <style>
+        body, table, td, a, p, h1, h2, h3, span, div {
+            font-family: tahoma !important;
+        }
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+        /* ===== RESPONSIVE MOBILE ===== */
+        @media only screen and (max-width: 620px) {
+
+            /* Contenedor principal */
+            .email-wrapper {
+                width: 100% !important;
+                min-width: 100% !important;
+            }
+
+            /* Imagen header */
+            .header-img {
+                width: 100% !important;
+                height: auto !important;
+            }
+
+            /* Paddings laterales */
+            .pad-lateral {
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+
+            /* Grid bancos: apilar columnas */
+            .col-banco {
+                display: block !important;
+                width: 100% !important;
+                padding: 0 0 10px 0 !important;
+            }
+
+            /* Grid Yape: apilar */
+            .col-yape {
+                display: block !important;
+                width: 100% !important;
+                padding: 0 0 10px 0 !important;
+            }
+
+            /* Ajuste de fuentes generales */
+            .titulo-fecha   { font-size: 22px !important; }
+            .nombre-programa{ font-size: 20px !important; }
+            .txt-body       { font-size: 16px !important; }
+            .txt-small      { font-size: 14px !important; }
+
+            /* ---- BANCOS ---- */
+            /* Label de sección "Cuentas Bancarias" / "Yape" */
+            .txt-seccion-label { font-size: 16px !important; letter-spacing: 1px !important; }
+
+            /* Nombre del banco (BCP, BBVA…) */
+            .txt-banco-nombre  { font-size: 20px !important; }
+
+            /* Entidad/razón social */
+            .txt-banco-entidad { font-size: 19px !important; }
+
+            /* Etiqueta "Cuenta" / "CCI" */
+            .txt-cuenta-label  { font-size: 17px !important; }
+
+            /* Número de cuenta y CCI */
+            .txt-banco-numero  { font-size: 17px !important; }
+
+            /* ---- YAPE ---- */
+            /* Número de teléfono Yape */
+            .txt-yape-numero   { font-size: 19px !important; }
+
+            /* Nombre de cuenta Yape */
+            .txt-yape-name     { font-size: 17px !important; }
+
+            /* Botón medios de pago */
+            .btn-medios td  { padding: 14px 24px !important; }
+            .btn-medios span{ font-size: 24px !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4;">
+  <br>
+  <br>
+
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding-top: 20px;">
+    <tr>
+      <td align="center" style="padding: 20px 0;">
+
+        <table border="0" cellpadding="0" cellspacing="0"
+               class="email-wrapper"
+               style="width: 750px; min-width: 750px; margin: 0 auto; background-color: #ffffff;">
+
+          <!-- HEADER IMAGE -->
+          <tr>
+            <td align="center" style="padding: 0;">
+              <img src="https://drive.google.com/uc?export=download&id=12rYMV07eG0nRiJNa5kIJWNV3hBOlDu_A"
+                   alt="WE Educación Ejecutiva"
+                   class="header-img"
+                   width="750"
+                   style="width: 750px; max-width: 100%; height: auto; display: block;">
+            </td>
+          </tr>
+
+          <!-- SALUDO -->
+          <tr>
+            <td align="center" class="pad-lateral" style="padding: 30px 60px 10px 60px;">
+              <h2 style="margin: 0 0 12px 0; font-size: 25px; font-weight: bold; text-align: center;">
+                Hola
+                <img src="https://drive.google.com/uc?export=download&id=1LnJWJM5g2ougTJU7Uh9B4wGXypLaDkXy" width="22" height="22" style="vertical-align: middle; margin-left: 4px; display: inline-block;">
+              </h2>
+              <p class="txt-body" style="margin: 0 0 10px 0; font-size: 19px; text-align: center; line-height: 1.6;">
+                Te saluda el área de finanzas de <strong>WE Educación Ejecutiva</strong>
+              </p>
+              <p class="txt-body" style="margin: 0; font-size: 19px; text-align: center; line-height: 1.8;">
+                Queremos recordarte que tu cuota vence el<br>
+                <strong class="titulo-fecha" style="font-size: 22px; color: #1a3c8f;"><?= pDatos.fecha_cuota ?></strong><br>
+                correspondiente a tu programa:
+              </p>
+            </td>
+          </tr>
+
+          <!-- NOMBRE DEL PROGRAMA -->
+          <tr>
+            <td align="center" class="pad-lateral" style="padding: 10px 60px 6px 60px;">
+              <p class="nombre-programa" style="margin: 0; font-size: 22px; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 0.5px;">
+                <?= pDatos.nombre_programa ?>
+              </p>
+            </td>
+          </tr>
+
+          <!-- AVISO OMITIR -->
+          <tr>
+            <td align="center" class="pad-lateral" style="padding: 4px 60px 20px 60px;">
+              <p class="txt-small" style="margin: 0; font-size: 17px; color: #cc0000; font-style: italic; text-align: center;">
+                (SI LOGRASTE REALIZAR TU PAGO, HACER CASO OMISO A ESTE MENSAJE).
+              </p>
+            </td>
+          </tr>
+
+          <!-- ===== MEDIOS DE PAGO ===== -->
+          <tr>
+            <td align="center" class="pad-lateral" style="padding: 0 40px 10px 40px;">
+
+              <!-- BOTÓN -->
+              <table border="0" cellpadding="0" cellspacing="0" class="btn-medios" style="margin: 0 auto 22px auto;">
+                <tr>
+                  <td align="center" bgcolor="#1a3c8f" style="border-radius: 6px; padding: 13px 50px;">
+                    <span style="font-size: 21px; font-weight: bold; color: #ffffff; font-family: tahoma !important; letter-spacing: 0.5px;">
+                      MEDIOS DE PAGO &nbsp;
+                      <img src="https://drive.google.com/uc?export=download&id=1gwIbBwTqW90DmLC1yrjbMF30FnxLBzJt" width="18" height="18" style="vertical-align: middle; display: inline-block;">
+                      <img src="https://drive.google.com/uc?export=download&id=1QxDHktAEi54K1tgDx0N2l1hE3Hg_O7jG" width="18" height="18" style="vertical-align: middle; display: inline-block; margin-left: 3px;">
+                    </span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- LABEL CUENTAS -->
+              <p class="txt-seccion-label" style="margin: 0 0 10px 0; font-size: 17px; font-weight: bold; color: #1a3c8f; letter-spacing: 1.5px; text-align: center; text-transform: uppercase;">Cuentas Bancarias</p>
+
+              <!-- GRID BANCOS 2 COLUMNAS -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <!-- BCP Latam -->
+                  <td class="col-banco" width="49%" valign="top" style="padding: 0 4px 8px 0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e0e4ef; border-radius: 8px; background-color: #f7f9ff;">
+                      <tr><td style="padding: 12px 14px;">
+                        <p class="txt-banco-nombre" style="margin: 0 0 4px 0; font-size: 17px; font-weight: bold; color: #1a3c8f; text-transform: uppercase; letter-spacing: 0.8px;">BCP</p>
+                        <p class="txt-banco-entidad" style="margin: 0 0 7px 0; font-size: 17px; color: #555555;">WE Educación Latam</p>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                          <tr>
+                            <td class="txt-cuenta-label" style="font-size: 13px; color: #888888; padding-bottom: 2px;">Cuenta</td>
+                            <td align="right" class="txt-banco-numero" style="font-size: 12px; font-weight: bold; color: #222222; font-family: 'courier new', monospace; padding-bottom: 2px;">193-9912130-0-24</td>
+                          </tr>
+                          <tr>
+                            <td class="txt-cuenta-label" style="font-size: 13px; color: #888888;">CCI</td>
+                            <td align="right" class="txt-banco-numero" style="font-size: 12px; font-weight: bold; color: #222222; font-family: 'courier new', monospace;">00219300991213002410</td>
+                          </tr>
+                        </table>
+                      </td></tr>
+                    </table>
+                  </td>
+                  <!-- BCP Foundation -->
+                  <td class="col-banco" width="49%" valign="top" style="padding: 0 0 8px 4px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e0e4ef; border-radius: 8px; background-color: #f7f9ff;">
+                      <tr><td style="padding: 12px 14px;">
+                        <p class="txt-banco-nombre" style="margin: 0 0 4px 0; font-size: 17px; font-weight: bold; color: #1a3c8f; text-transform: uppercase; letter-spacing: 0.8px;">BCP</p>
+                        <p class="txt-banco-entidad" style="margin: 0 0 7px 0; font-size: 17px; color: #555555;">WE Foundation</p>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                          <tr>
+                            <td class="txt-cuenta-label" style="font-size: 13px; color: #888888; padding-bottom: 2px;">Cuenta</td>
+                            <td align="right" class="txt-banco-numero" style="font-size: 12px; font-weight: bold; color: #222222; font-family: 'courier new', monospace; padding-bottom: 2px;">193-9914694-0-22</td>
+                          </tr>
+                          <tr>
+                            <td class="txt-cuenta-label" style="font-size: 13px; color: #888888;">CCI</td>
+                            <td align="right" class="txt-banco-numero" style="font-size: 12px; font-weight: bold; color: #222222; font-family: 'courier new', monospace;">00219300991469402218</td>
+                          </tr>
+                        </table>
+                      </td></tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <!-- BBVA -->
+                  <td class="col-banco" width="49%" valign="top" style="padding: 0 4px 8px 0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e0e4ef; border-radius: 8px; background-color: #f7f9ff;">
+                      <tr><td style="padding: 12px 14px;">
+                        <p class="txt-banco-nombre" style="margin: 0 0 4px 0; font-size: 17px; font-weight: bold; color: #1a3c8f; text-transform: uppercase; letter-spacing: 0.8px;">BBVA</p>
+                        <p class="txt-banco-entidad" style="margin: 0 0 7px 0; font-size: 17px; color: #555555;">WE Educación Ejecutiva</p>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                          <tr>
+                            <td class="txt-cuenta-label" style="font-size: 13px; color: #888888; padding-bottom: 2px;">Cuenta</td>
+                            <td align="right" class="txt-banco-numero" style="font-size: 12px; font-weight: bold; color: #222222; font-family: 'courier new', monospace; padding-bottom: 2px;">0011-0387-01000514-49</td>
+                          </tr>
+                          <tr>
+                            <td class="txt-cuenta-label" style="font-size: 13px; color: #888888;">CCI</td>
+                            <td align="right" class="txt-banco-numero" style="font-size: 12px; font-weight: bold; color: #222222; font-family: 'courier new', monospace;">011-387-000100051449-85</td>
+                          </tr>
+                        </table>
+                      </td></tr>
+                    </table>
+                  </td>
+                  <!-- Interbank -->
+                  <td class="col-banco" width="49%" valign="top" style="padding: 0 0 8px 4px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e0e4ef; border-radius: 8px; background-color: #f7f9ff;">
+                      <tr><td style="padding: 12px 14px;">
+                        <p class="txt-banco-nombre" style="margin: 0 0 4px 0; font-size: 17px; font-weight: bold; color: #1a3c8f; text-transform: uppercase; letter-spacing: 0.8px;">INTERBANK</p>
+                        <p class="txt-banco-entidad" style="margin: 0 0 7px 0; font-size: 17px; color: #555555;">WE Educación Ejecutiva</p>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                          <tr>
+                            <td class="txt-cuenta-label" style="font-size: 13px; color: #888888; padding-bottom: 2px;">Cuenta</td>
+                            <td align="right" class="txt-banco-numero" style="font-size: 12px; font-weight: bold; color: #222222; font-family: 'courier new', monospace; padding-bottom: 2px;">2003006085197</td>
+                          </tr>
+                          <tr>
+                            <td class="txt-cuenta-label" style="font-size: 13px; color: #888888;">CCI</td>
+                            <td align="right" class="txt-banco-numero" style="font-size: 12px; font-weight: bold; color: #222222; font-family: 'courier new', monospace;">003-200-003006085197-36</td>
+                          </tr>
+                        </table>
+                      </td></tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- DIVISOR -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr><td height="1" style="border-top: 1px solid #e0e4ef; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+              </table>
+              <br>
+
+              <!-- LABEL YAPE -->
+              <p class="txt-seccion-label" style="margin: 0 0 10px 0; font-size: 17px; font-weight: bold; color: #1a3c8f; letter-spacing: 1.5px; text-align: center; text-transform: uppercase;">Yape</p>
+
+              <!-- YAPE CARDS -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td class="col-yape" width="49%" style="padding: 0 4px 0 0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e0e4ef; border-radius: 8px; background-color: #fff5f9;">
+                      <tr><td style="padding: 12px 14px;">
+                        <table border="0" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td width="34" valign="middle">
+                              <table border="0" cellpadding="0" cellspacing="0" style="width: 32px; height: 32px; border-radius: 50%; background-color: #742d8a;">
+                                <tr><td align="center" valign="middle" style="font-size: 11px; font-weight: bold; color: #ffffff; width: 32px; height: 32px; text-align: center; line-height: 32px;">Y</td></tr>
+                              </table>
+                            </td>
+                            <td valign="middle" style="padding-left: 10px;">
+                              <p class="txt-yape-numero" style="margin: 0; font-size: 15px; font-weight: bold; color: #222222; font-family: 'courier new', monospace;">979 493 060</p>
+                              <p class="txt-yape-name" style="margin: 2px 0 0 0; font-size: 12px; color: #777777;">WE Foundation</p>
+                            </td>
+                          </tr>
+                        </table>
+                      </td></tr>
+                    </table>
+                  </td>
+                  <td class="col-yape" width="49%" style="padding: 0 0 0 4px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e0e4ef; border-radius: 8px; background-color: #fff5f9;">
+                      <tr><td style="padding: 12px 14px;">
+                        <table border="0" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td width="34" valign="middle">
+                              <table border="0" cellpadding="0" cellspacing="0" style="width: 32px; height: 32px; border-radius: 50%; background-color: #742d8a;">
+                                <tr><td align="center" valign="middle" style="font-size: 11px; font-weight: bold; color: #ffffff; width: 32px; height: 32px; text-align: center; line-height: 32px;">Y</td></tr>
+                              </table>
+                            </td>
+                            <td valign="middle" style="padding-left: 10px;">
+                              <p class="txt-yape-numero" style="margin: 0; font-size: 15px; font-weight: bold; color: #222222; font-family: 'courier new', monospace;">999 606 366</p>
+                              <p class="txt-yape-name" style="margin: 2px 0 0 0; font-size: 12px; color: #777777;">WE Educación Ejecutiva</p>
+                            </td>
+                          </tr>
+                        </table>
+                      </td></tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+          <!-- ===== FIN MEDIOS DE PAGO ===== -->
+
+          <!-- SEPARADOR -->
+          <tr>
+            <td align="center" class="pad-lateral" style="padding: 20px 60px 0 60px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr><td height="1" style="border-top: 1px solid #e8eaf0; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ===== RECUERDA ===== -->
+          <tr>
+            <td align="center" class="pad-lateral" style="padding: 22px 40px 6px 40px;">
+
+              <!-- TÍTULO -->
+              <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 16px auto;">
+                <tr>
+                  <td align="center" valign="middle" style="padding-right: 8px;">
+                    <table border="0" cellpadding="0" cellspacing="0" style="width: 28px; height: 28px; border-radius: 50%; background-color: #1a3c8f;">
+                      <tr><td align="center" valign="middle" style="font-size: 14px; font-weight: bold; color: #ffffff; width: 28px; height: 28px; text-align: center; line-height: 28px;">!</td></tr>
+                    </table>
+                  </td>
+                  <td valign="middle">
+                    <strong style="font-size: 15px; color: #1a1a1a; letter-spacing: 0.4px;">RECUERDA</strong>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CARD RECUERDA -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #dde4f5; border-radius: 10px; background-color: #f7f9ff;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+
+                    <!-- PASO 1 -->
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 16px;">
+                      <tr>
+                        <td width="30" valign="top" style="padding-top: 1px;">
+                          <table border="0" cellpadding="0" cellspacing="0" style="width: 24px; height: 24px; border-radius: 50%; background-color: #1a3c8f;">
+                            <tr><td align="center" valign="middle" style="font-size: 11px; font-weight: bold; color: #ffffff; width: 24px; height: 24px; text-align: center; line-height: 24px;">1</td></tr>
+                          </table>
+                        </td>
+                        <td valign="top" style="padding-left: 10px;">
+                          <p class="txt-small" style="margin: 0; font-size: 12.5px; color: #333333; line-height: 1.6;">
+                            Una vez realizado el pago, envía el <strong style="color: #1a3c8f;">comprobante</strong> respondiendo a este correo o por el siguiente medio:
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- FILA CORREO -->
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #dde4f5; border-radius: 7px; background-color: #ffffff; margin-bottom: 8px;">
+                      <tr>
+                        <td style="padding: 10px 14px;">
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                              <td width="10" valign="middle">
+                                <table border="0" cellpadding="0" cellspacing="0" style="width: 8px; height: 8px; border-radius: 50%; background-color: #1a3c8f;">
+                                  <tr><td style="width: 8px; height: 8px; line-height: 8px; font-size: 0;">&nbsp;</td></tr>
+                                </table>
+                              </td>
+                              <td valign="middle" style="padding-left: 10px;" width="60">
+                                <span style="font-size: 11px; color: #888888;">Correo</span>
+                              </td>
+                              <td valign="middle">
+                                <a href="mailto:pagos@we-educacion.com" style="font-size: 12px; font-weight: bold; color: #1a3c8f; text-decoration: none;">pagos@we-educacion.com</a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- FILA ASUNTO -->
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #dde4f5; border-radius: 7px; background-color: #ffffff;">
+                      <tr>
+                        <td style="padding: 10px 14px;">
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                              <td width="10" valign="middle">
+                                <table border="0" cellpadding="0" cellspacing="0" style="width: 8px; height: 8px; border-radius: 50%; background-color: #1a3c8f;">
+                                  <tr><td style="width: 8px; height: 8px; line-height: 8px; font-size: 0;">&nbsp;</td></tr>
+                                </table>
+                              </td>
+                              <td valign="middle" style="padding-left: 10px;" width="60">
+                                <span style="font-size: 11px; color: #888888;">Asunto</span>
+                              </td>
+                              <td valign="middle">
+                                <span style="font-size: 12px; font-weight: bold; color: #1a3c8f;">Pago Cuota &nbsp;·&nbsp; Nombre del programa</span>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- MENSAJE CIERRE -->
+          <tr>
+            <td align="center" class="pad-lateral" style="padding: 16px 60px 6px 60px;">
+              <p class="txt-body" style="margin: 0; font-size: 13px; text-align: center; line-height: 1.6; color: #555555;">
+                Agradecemos tu compromiso y estamos aquí para apoyarte en tu camino educativo
+              </p>
+            </td>
+          </tr>
+
+          <!-- SEPARADOR -->
+          <tr>
+            <td align="center" class="pad-lateral" style="padding: 16px 60px 0 60px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr><td height="1" style="border-top: 1px solid #e8eaf0; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ===== NOTA ===== -->
+          <tr>
+            <td align="center" class="pad-lateral" style="padding: 20px 40px 32px 40px;">
+
+              <!-- TÍTULO NOTA -->
+              <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 14px auto;">
+                <tr>
+                  <td align="center" valign="middle" style="padding-right: 8px;">
+                    <table border="0" cellpadding="0" cellspacing="0" style="width: 26px; height: 26px; border-radius: 50%; background-color: #cc0000;">
+                      <tr><td align="center" valign="middle" style="font-size: 13px; font-weight: bold; color: #ffffff; width: 26px; height: 26px; text-align: center; line-height: 26px;">!</td></tr>
+                    </table>
+                  </td>
+                  <td valign="middle">
+                    <strong style="font-size: 14px; color: #cc0000; letter-spacing: 0.4px;">NOTA IMPORTANTE</strong>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CARD NOTA -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #f5c6c6; border-radius: 10px; background-color: #fff5f5;">
+                <tr>
+                  <td align="center" style="padding: 16px 24px;">
+                    <p class="txt-small" style="margin: 0; font-size: 12.5px; color: #a00000; text-align: center; line-height: 1.7;">
+                      El envío de <strong>accesos, materiales y certificados</strong><br>
+                      están sujetos al cumplimiento de los pagos.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+          <!-- ===== FIN NOTA ===== -->
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+  <?!= obtenerHtml('Footer') ?>
+
+</body>
+</html>

@@ -69,19 +69,25 @@ const transporterSAP = nodemailer.createTransport({
 const templatePath48 = path.join(__dirname, 'template_48h.html');
 const templatePath24 = path.join(__dirname, 'template_24h.html'); 
 const footerPath = path.join(__dirname, 'footer.html');
+const footerFICOPath = path.join(__dirname, 'sello_fico.html');
 const templatePathSAP = path.join(__dirname, 'template_sap.html');
 
+const templatePathFicoCuotas = path.join(__dirname, 'template_fico_cuotas.html');
+let htmlTemplateFicoCuotas = "";
 
 let htmlTemplatePWAPPS = "";
 let htmlTemplateSAP = "";
 let htmlTemplate48 = "";
 let htmlTemplate24 = "";
 let htmlFooter = "";
+let htmlFICOFooter = "";
 
 try {
     if (fs.existsSync(templatePath48)) htmlTemplate48 = fs.readFileSync(templatePath48, 'utf8');
+if (fs.existsSync(templatePathFicoCuotas)) htmlTemplateFicoCuotas = fs.readFileSync(templatePathFicoCuotas, 'utf8');
     if (fs.existsSync(templatePath24)) htmlTemplate24 = fs.readFileSync(templatePath24, 'utf8');
     if (fs.existsSync(footerPath)) htmlFooter = fs.readFileSync(footerPath, 'utf8');
+    if (fs.existsSync(footerFICOPath)) htmlFICOFooter = fs.readFileSync(footerFICOPath, 'utf8');
     if (fs.existsSync(templatePathSAP)) htmlTemplateSAP = fs.readFileSync(templatePathSAP, 'utf8');
     const templatePathPWAPPS = path.join(__dirname, 'template_pwapps.html');
     if (fs.existsSync(templatePathPWAPPS)) htmlTemplatePWAPPS = fs.readFileSync(templatePathPWAPPS, 'utf8');
@@ -188,6 +194,59 @@ app.post('/api/send-inscription', async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
+});
+
+
+ 
+// ================= API ENDPOINT (RECORDATORIO DE CUOTAS - FICO) =================
+app.post('/api/send-fico-cuotas', async (req, res) => {
+ 
+    const token = req.body.token;
+    if (token !== API_SECRET) return res.status(403).json({ success: false, message: "Access Denied." });
+ 
+    const students = req.body.students;
+ 
+    if (!students || !Array.isArray(students) || students.length === 0) {
+        return res.status(400).json({ success: false, message: "No students data provided." });
+    }
+ 
+    if (!htmlTemplateFicoCuotas) return res.status(500).json({ success: false, message: "Falta template_fico_cuotas.html" });
+ 
+    console.log(`📩 Procesando ${students.length} alumnos para envío de Recordatorio de Cuotas.`);
+ 
+    let sentCount = 0;
+    let errorCount = 0;
+ 
+    for (const student of students) {
+        try {
+            let finalHtml = htmlTemplateFicoCuotas
+                .replace(/<\?= pDatos\.fecha_cuota \?>/g, student.fecha_cuota || "")
+                .replace(/<\?= pDatos\.nombre_programa \?>/g, student.nombre_programa || "Tu Programa")
+                .replace(/<\?!= obtenerHtml\('Footer'\) \?>/g, htmlFICOFooter);
+ 
+            await transporterPagos.sendMail({
+                from: `"WE Educación Ejecutiva" <pagos@we-educacion.com>`,
+                to: student.email,
+                subject: `​🤓🔔RECORDATORIO DE PAGO | ${student.nombre_programa} | WE EDUCACIÓN EJECUTIVA 💙`,
+                html: finalHtml,
+            });
+ 
+            console.log(`   ✅ (FICO-CUOTAS) Enviado a: ${student.email}`);
+            sentCount++;
+            await new Promise(r => setTimeout(r, 100));
+ 
+        } catch (error) {
+            console.error(`   ❌ Error enviando FICO-CUOTAS a ${student.email}:`, error.message);
+            errorCount++;
+        }
+    }
+ 
+    res.json({
+        success: true,
+        message: `Proceso de recordatorio de cuotas finalizado.`,
+        sentCount: sentCount,
+        errorCount: errorCount
+    });
 });
 
 // ================= API ENDPOINT (BIENVENIDA - Usa el de 48h/General) =================
