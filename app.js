@@ -72,6 +72,8 @@ const footerPath = path.join(__dirname, 'footer.html');
 const footerFICOPath = path.join(__dirname, 'sello_fico.html');
 const templatePathSAP = path.join(__dirname, 'template_sap.html');
 
+const templatePathFicoProxima = path.join(__dirname, 'template_fico_proxima.html');
+
 const templatePathFicoCuotas = path.join(__dirname, 'template_fico_cuotas.html');
 let htmlTemplateFicoCuotas = "";
 
@@ -82,13 +84,19 @@ let htmlTemplate24 = "";
 let htmlFooter = "";
 let htmlFICOFooter = "";
 
+let htmlTemplateFicoProxima = "";
 try {
     if (fs.existsSync(templatePath48)) htmlTemplate48 = fs.readFileSync(templatePath48, 'utf8');
 if (fs.existsSync(templatePathFicoCuotas)) htmlTemplateFicoCuotas = fs.readFileSync(templatePathFicoCuotas, 'utf8');
     if (fs.existsSync(templatePath24)) htmlTemplate24 = fs.readFileSync(templatePath24, 'utf8');
     if (fs.existsSync(footerPath)) htmlFooter = fs.readFileSync(footerPath, 'utf8');
     if (fs.existsSync(footerFICOPath)) htmlFICOFooter = fs.readFileSync(footerFICOPath, 'utf8');
-    if (fs.existsSync(templatePathSAP)) htmlTemplateSAP = fs.readFileSync(templatePathSAP, 'utf8');
+    if (fs.existsSync(templatePathSAP)) htmlTemplateSAP = fs.readFileSync(templatePathSAP, 'utf8'); 
+        
+    if (fs.existsSync(templatePathFicoProxima)) {
+        htmlTemplateFicoProxima = fs.readFileSync(templatePathFicoProxima, 'utf8');
+        console.log("✅ template_fico_proxima.html cargado.");
+    }
     const templatePathPWAPPS = path.join(__dirname, 'template_pwapps.html');
     if (fs.existsSync(templatePathPWAPPS)) htmlTemplatePWAPPS = fs.readFileSync(templatePathPWAPPS, 'utf8');
     console.log("✅ Plantillas cargadas en memoria.");
@@ -198,6 +206,92 @@ app.post('/api/send-inscription', async (req, res) => {
 
 
  
+app.post('/api/send-fico-proxima', async (req, res) => {
+ 
+    const token = req.body.token;
+    if (token !== API_SECRET) {
+        return res.status(403).json({ success: false, message: "Access Denied." });
+    }
+ 
+    const { email, asunto, nombre, categoria, fecha_cuota, monto, moneda } = req.body;
+ 
+    if (!email || !nombre || !asunto) {
+        return res.status(400).json({
+            success: false,
+            message: "Faltan campos obligatorios: email, nombre, asunto."
+        });
+    }
+ 
+    if (!htmlTemplateFicoProxima) {
+        return res.status(500).json({
+            success: false,
+            message: "Falta template_fico_proxima.html en el servidor."
+        });
+    }
+ 
+    const tieneCuota = fecha_cuota && String(fecha_cuota).trim() !== "";
+ 
+    // Bloque siguiente cuota
+    const bloqueCuota = tieneCuota
+        ? `<table align="center" style="border-collapse:collapse;width:350px;text-align:center;padding-bottom:25px">
+            <thead>
+              <tr style="background-color:rgb(17,1,101);color:white;">
+                <td colspan="2" style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">Tu siguiente cuota</font></td>
+              </tr>
+              <tr style="background-color:rgb(17,1,101);color:white;">
+                <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">Fecha de Pago</font></td>
+                <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">Monto a Pagar</font></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">${fecha_cuota}</font></td>
+                <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">${moneda || "S/"} ${monto || ""}</font></td>
+              </tr>
+            </tbody>
+           </table>`
+        : `<table align="center" style="border-collapse:collapse;width:350px;text-align:center;padding-bottom:25px">
+            <thead>
+              <tr style="background-color:rgb(17,1,101);color:white;">
+                <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">SITUACIÓN</font></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:10px;border:1px solid black;color:green;">
+                  <font face="Tahoma" size="3">
+                    ¡Felicitaciones! Has cancelado el total de tu ${categoria || "programa"}. No tienes cuotas pendientes.
+                  </font>
+                </td>
+              </tr>
+            </tbody>
+           </table>`;
+ 
+    // La plantilla usa Apps Script tags, aquí hacemos el reemplazo manual
+    let finalHtml = htmlTemplateFicoProxima
+        .replace(/<\?= pDatos\.nombre \?>/g,    nombre)
+        .replace(/<\?= pDatos\.categoria \?>/g, categoria || "programa")
+        // Eliminar el bloque condicional Apps Script y reemplazar por HTML ya resuelto
+        .replace(/(<\?if[\s\S]*?\?>[\s\S]*?<\?}\s*else\s*\{[\s\S]*?\?>[\s\S]*?<\?}\?>)/g, bloqueCuota)
+        .replace(/<\?!= obtenerHtml\('footer'\) \?>/g, htmlFICOFooter || "");
+ 
+    try {
+        await transporterPagos.sendMail({
+            from: `"WE Educación Ejecutiva" <pagos@we-educacion.com>`,
+            to: email,
+            subject: asunto,
+            html: finalHtml,
+        });
+ 
+        console.log(`✅ (FICO-PROXIMA) Enviado a: ${email}`);
+        res.json({ success: true, message: `Correo enviado a ${email}.` });
+ 
+    } catch (error) {
+        console.error(`❌ Error FICO-PROXIMA a ${email}:`, error.message);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // ================= API ENDPOINT (RECORDATORIO DE CUOTAS - FICO) =================
 app.post('/api/send-fico-cuotas', async (req, res) => {
  
