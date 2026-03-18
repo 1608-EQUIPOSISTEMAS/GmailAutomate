@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { tPagos, tFicoProxima } = require('../config/transporters');
+const { tPagos, tFicoProxima, tAdvertencia } = require('../config/transporters');
 const { SENDER_GENERAL, SENDER_PAGOS } = require('../config/env');
 const templateEngine = require('../services/templateEngine');
 const { sendBatch, sendSingle } = require('../services/mailer');
@@ -160,9 +160,9 @@ router.post('/send-fico-adventencia', async (req, res) => {
             'pDatos.fecha_cuota':     student.fecha_cuota || '',
             'pDatos.nombre_programa': student.nombre_programa || 'Tu Programa',
         });
-        
+
         return {
-            transporter: tPagos,
+            transporter: tAdvertencia,
             label: 'FICO-ADVERTENCIA',
             mail: {
                 from: `"WE Educación Ejecutiva" <${SENDER_PAGOS}>`,

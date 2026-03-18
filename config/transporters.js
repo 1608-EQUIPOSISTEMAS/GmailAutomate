@@ -17,6 +17,7 @@ module.exports = {
     t48h:        createTransporter(SMTP.keys.k48h),
     t24h:        createTransporter(SMTP.keys.k24h),
     tPagos:      createTransporter(SMTP.keys.pagos),
+    tAdvertencia:      createTransporter(SMTP.keys.advertencia),
     tSAP:        createTransporter(SMTP.keys.sap),
     tFicoProxima: createTransporter(SMTP.keys.ficoProxima),
 };

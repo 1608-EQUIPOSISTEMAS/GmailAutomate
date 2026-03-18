@@ -13,6 +13,7 @@ module.exports = {
             k48h:        process.env.SMTP_KEY_48H,
             k24h:        process.env.SMTP_KEY_24H,
             pagos:       process.env.SMTP_KEY_PAGOS,
+            advertencia: process.env.SMTP_KEY_ADVERTENCIA,
             sap:         process.env.SMTP_KEY_SAP,
             ficoProxima: process.env.SMTP_KEY_FICO_PROXIMA,
         },
