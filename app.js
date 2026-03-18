@@ -65,6 +65,19 @@ const transporterSAP = nodemailer.createTransport({
     },
 });
 
+// ---------------------------------------------------------
+// 5. TRANSPORTER EXCLUSIVO PARA FICO PRÓXIMA
+// ---------------------------------------------------------
+const transporterFicoProxima = nodemailer.createTransport({
+    host: "smtp.zeptomail.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user: "emailapikey",
+        pass: "wSsVR60lrxD5Dah6mmarIuc6mg8HAVz1Rx9/iVOg4iX7TPnG9Mczk0fHBwX0T/AaEzZuEmdEoOh/kRZT0mUPjdl8nFEFASiF9mqRe1U4J3x17qnvhDzOWWtakBSNLIwOwAxtm2JmG8gg+g=="
+    },
+});
+
 // ================= CARGA DE PLANTILLAS =================
 const templatePath48 = path.join(__dirname, 'template_48h.html');
 const templatePath24 = path.join(__dirname, 'template_24h.html'); 
@@ -229,43 +242,48 @@ app.post('/api/send-fico-proxima', async (req, res) => {
         });
     }
  
-    const tieneCuota = fecha_cuota && String(fecha_cuota).trim() !== "";
- 
-    // Bloque siguiente cuota
-    const bloqueCuota = tieneCuota
-        ? `<table align="center" style="border-collapse:collapse;width:350px;text-align:center;padding-bottom:25px">
-            <thead>
-              <tr style="background-color:rgb(17,1,101);color:white;">
-                <td colspan="2" style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">Tu siguiente cuota</font></td>
-              </tr>
-              <tr style="background-color:rgb(17,1,101);color:white;">
-                <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">Fecha de Pago</font></td>
-                <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">Monto a Pagar</font></td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">${fecha_cuota}</font></td>
-                <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">${moneda || "S/"} ${monto || ""}</font></td>
-              </tr>
-            </tbody>
-           </table>`
-        : `<table align="center" style="border-collapse:collapse;width:350px;text-align:center;padding-bottom:25px">
-            <thead>
-              <tr style="background-color:rgb(17,1,101);color:white;">
-                <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">SITUACIÓN</font></td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding:10px;border:1px solid black;color:green;">
-                  <font face="Tahoma" size="3">
-                    ¡Felicitaciones! Has cancelado el total de tu ${categoria || "programa"}. No tienes cuotas pendientes.
-                  </font>
-                </td>
-              </tr>
-            </tbody>
-           </table>`;
+    const tieneSiguiente = fecha_cuota && monto && String(monto).trim() !== "";
+
+    const bloqueCuota = tieneSiguiente
+      ? `<table align="center" style="border-collapse:collapse;width:350px;text-align:center;padding-bottom:25px">
+          <thead>
+            <tr style="background-color:rgb(17,1,101);color:white;">
+              <td colspan="2" style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">Tu siguiente cuota</font></td>
+            </tr>
+            <tr style="background-color:rgb(17,1,101);color:white;">
+              <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">Fecha de Pago</font></td>
+              <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">Monto a Pagar</font></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">${fecha_cuota}</font></td>
+              <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">${moneda || "S/"} ${monto}</font></td>
+            </tr>
+          </tbody>
+         </table>`
+      : `<table align="center" style="border-collapse:collapse;width:350px;text-align:center;padding-bottom:25px">
+          <thead>
+            <tr style="background-color:rgb(17,1,101);color:white;">
+              <td colspan="2" style="padding:5px;border:1px solid black">
+                <font face="Tahoma" size="3">ÚLTIMO PAGO REALIZADO</font>
+              </td>
+            </tr>
+            <tr style="background-color:rgb(17,1,101);color:white;">
+              <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">FECHA</font></td>
+              <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">SITUACIÓN</font></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:5px;border:1px solid black"><font face="Tahoma" size="3">${fecha_cuota}</font></td>
+              <td style="padding:5px;border:1px solid black;color:red;font-weight:bold">
+                <font face="Tahoma" size="3">Sin deuda</font>
+              </td>
+            </tr>
+          </tbody>
+         </table>`;
+
  
     // La plantilla usa Apps Script tags, aquí hacemos el reemplazo manual
     let finalHtml = htmlTemplateFicoProxima
@@ -276,7 +294,7 @@ app.post('/api/send-fico-proxima', async (req, res) => {
         .replace(/<\?!= obtenerHtml\('footer'\) \?>/g, htmlFICOFooter || "");
  
     try {
-        await transporterPagos.sendMail({
+        await transporterFicoProxima.sendMail({
             from: `"WE Educación Ejecutiva" <pagos@we-educacion.com>`,
             to: email,
             subject: asunto,

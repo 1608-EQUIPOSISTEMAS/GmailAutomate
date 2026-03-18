@@ -23,7 +23,7 @@ const payloadSinCuota = {
     asunto:          "Confirmación de cuota 3 - Diplomado en Finanzas | WE Educación ejecutiva",
     nombre:          "Max",
     categoria:       "Diplomado",
-    fecha_cuota:     null,
+    fecha_cuota:     "15 Abril",
     monto:           null,
     moneda:          null,
     nombre_programa: "DIPLOMADO EN FINANZAS"
