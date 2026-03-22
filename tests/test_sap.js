@@ -5,13 +5,25 @@ async function run() {
     const payload = {
         token: TOKEN,
         students: [
-            {
-                email:    'eliuthseguil@gmail.com',
-                user:     'SAP_EST_001',
-                password: 'ClaveSegura2026',
-                programa: 'SAP HANA SD',
-                bannerId: '1FdSzuN51vbaxNlRTWGEDNLKpLOB6dhPt',
-            },
+            { user: 'SAP_HCM_01', password: 'Clave12345', email: 'eliuthseguil@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_01', password: 'Clave12345', email: 'acurioisabella@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_02', password: 'Clave12345', email: 'garcemarq@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_03', password: 'Clave12345', email: 'claudiachanametafur@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_04', password: 'Clave12345', email: 'perez_vane20@hotmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_05', password: 'Clave12345', email: 'dayana25224@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_06', password: 'Clave12345', email: 'victorandre020201@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_07', password: 'Clave12345', email: 'fernandezancasied@outlook.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_08', password: 'Clave12345', email: 'javiergodenzi@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_09', password: 'Clave12345', email: 'yosmarlinyole@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_10', password: 'Clave12345', email: 'lina.livian24@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_11', password: 'Clave12345', email: 'ariafany.9105@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_12', password: 'Clave12345', email: 'jmanuelmamanimamani@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_13', password: 'Clave12345', email: 'masamynh@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_14', password: 'Clave12345', email: 'andyobregon20@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_15', password: 'Clave12345', email: 'fiorellaore2798@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_16', password: 'Clave12345', email: 'edwin.quispe.j@uni.pe', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_17', password: 'Clave12345', email: 'darlysanchez226@gmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
+            { user: 'SAP_HCM_18', password: 'Clave12345', email: 'lizde_584@hotmail.com', programa: 'SAP HANA HCM', bannerId: '1gfW07TT7wdiW7W5d4vrYkjkP4FsZdg28' },
         ],
     };
 

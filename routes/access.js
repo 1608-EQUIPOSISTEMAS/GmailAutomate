@@ -33,7 +33,7 @@ router.post('/send-sap-emails', async (req, res) => {
             mail: {
                 from: `"WE Educación Ejecutiva" <${SENDER_GENERAL}>`,
                 to: student.email,
-                subject: 'USUARIO SAP MM - W|E Educación Ejecutiva',
+                subject: 'USUARIO SAP HCM - W|E Educación Ejecutiva',
                 html,
             },
         };

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Accesos SAP - WE Educación</title>
+    <style>
+        body, table, td, a, p, h1, h2, h3, span, div { font-family: tahoma, Arial, sans-serif !important; }
+        body, table, td, a { -webkit-text-size-adjust: none; -ms-text-size-adjust: none; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #ffffff;">
+    <br><br>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <table border="0" cellpadding="0" cellspacing="0" width="650" style="width: 650px; max-width: 650px; margin: 0 auto;">
+                    
+                    <tr>
+                        <td align="center" style="padding: 0;">
+                            <img src="https://drive.google.com/uc?export=download&id=<?= pDatos.bannerId ?>"
+                                 alt="<?= pDatos.programa ?>"
+                                 width="650"
+                                 style="width: 100%; max-width: 650px; height: auto; display: block;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center" style="padding: 30px 40px;">
+                            
+                            <h2 style="margin: 0 0 25px 0; font-size: 22px; color: #000000; text-align: center;">
+                                ¡Te damos la bienvenida al programa <?= pDatos.programa ?>!
+                            </h2>
+                            
+                            <p style="margin: 0 0 5px 0; font-size: 18px; color: #000066; text-align: center; font-weight: bold;">
+                                Usuario: <span style="font-weight: normal; color: #000000;"><?= pDatos.user ?></span>
+                            </p>
+                            <p style="margin: 0 0 25px 0; font-size: 18px; color: #000066; text-align: center; font-weight: bold;">
+                                Contraseña: <span style="font-weight: normal; color: #000000;"><?= pDatos.password ?></span>
+                            </p>
+
+                            <p style="margin: 0 0 5px 0; font-size: 16px; color: #000000; text-align: center;">
+                                La letra <strong>"C"</strong> en la palabra <strong>"Clave"</strong> es <strong>mayúscula</strong>.
+                            </p>
+                            <p style="margin: 0 0 30px 0; font-size: 16px; color: #000000; text-align: center;">
+                                Evita copiar y pegar la contraseña; de lo contrario, <strong>tu usuario se bloqueará</strong>.
+                            </p>
+
+                            <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td align="center" bgcolor="#1f1a8e" style="border-radius: 30px;">
+                                        <a href="https://drive.google.com/drive/folders/1ERjz_Rf8zmKjrmBFhwz5WSgMPuS2lLtH" target="_blank" style="display: inline-block; padding: 12px 40px; font-size: 16px; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 30px; border: 1px solid #1f1a8e;">
+                                            INSTALADOR SAP
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin: 30px 0 0 0; font-size: 15px; color: #333333; text-align: center;">
+                                Si presentas algún inconveniente, contáctanos al <a href="https://wa.me/51922744702" target="_blank" style="color: #0056b3; text-decoration: underline;">922744702</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    
+    <?!= obtenerHtml('Footer') ?>
+
+</body>
+</html>
