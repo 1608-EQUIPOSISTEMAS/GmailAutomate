@@ -8,7 +8,7 @@ const router = Router();
 
 // POST /api/send-sap-emails — Envío masivo de credenciales SAP
 router.post('/send-sap-emails', async (req, res) => {
-    const { students } = req.body;
+    const { students, subject } = req.body;
 
     if (!students || !Array.isArray(students) || students.length === 0) {
         return res.status(400).json({ success: false, message: 'No students data provided.' });
@@ -18,6 +18,7 @@ router.post('/send-sap-emails', async (req, res) => {
         return res.status(500).json({ success: false, message: 'Falta sap.html' });
     }
 
+    const sapSubject = subject || 'USUARIO SAP - W|E Educación Ejecutiva';
     console.log(`📩 Procesando ${students.length} alumnos para envío de Accesos SAP.`);
 
     const { sentCount, errorCount } = await sendBatch(students, (student) => {
@@ -33,7 +34,7 @@ router.post('/send-sap-emails', async (req, res) => {
             mail: {
                 from: `"WE Educación Ejecutiva" <${SENDER_GENERAL}>`,
                 to: student.email,
-                subject: 'USUARIO SAP HCM - W|E Educación Ejecutiva',
+                subject: sapSubject,
                 html,
             },
         };
@@ -44,7 +45,7 @@ router.post('/send-sap-emails', async (req, res) => {
 
 // POST /api/send-pwapps-emails — Envío masivo de credenciales PowerApps
 router.post('/send-pwapps-emails', async (req, res) => {
-    const { students } = req.body;
+    const { students, subject } = req.body;
 
     if (!students || !Array.isArray(students) || students.length === 0) {
         return res.status(400).json({ success: false, message: 'No students data provided.' });
@@ -54,6 +55,7 @@ router.post('/send-pwapps-emails', async (req, res) => {
         return res.status(500).json({ success: false, message: 'Falta pwapps.html' });
     }
 
+    const pwappsSubject = subject || 'USUARIO POWER APPS - W|E Educación Ejecutiva';
     console.log(`📩 Procesando ${students.length} alumnos para envío de Accesos Power Apps.`);
 
     const { sentCount, errorCount } = await sendBatch(students, (student) => {
@@ -69,7 +71,7 @@ router.post('/send-pwapps-emails', async (req, res) => {
             mail: {
                 from: `"WE Educación Ejecutiva" <${SENDER_GENERAL}>`,
                 to: student.email,
-                subject: 'USUARIO POWER APPS - W|E Educación Ejecutiva',
+                subject: pwappsSubject,
                 html,
             },
         };
